@@ -4,10 +4,13 @@ import { getMessages, sendMessage } from "../services/messageService";
 function Chat() {
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");
-  const [sender, setSender] = useState("Aleksandra 😊"); // kasnije ćeš ovo zameniti loginom
-
+  const [sender, setSender] = useState(""); // prazno, popuni iz localStorage
 
   useEffect(() => {
+    // Uzmi username iz localStorage
+    const savedUser = localStorage.getItem("chatUser");
+    if (savedUser) setSender(savedUser);
+
     const fetchMessages = async () => {
       try {
         const data = await getMessages();
@@ -20,10 +23,8 @@ function Chat() {
     fetchMessages();
   }, []);
 
-
   const handleSend = async (e) => {
     e.preventDefault();
-
     if (!text.trim()) return;
 
     const newMessage = { sender, text };
@@ -54,7 +55,6 @@ function Chat() {
         )}
       </div>
 
-   
       <form onSubmit={handleSend} className="flex gap-2">
         <input
           type="text"

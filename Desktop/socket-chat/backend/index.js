@@ -3,6 +3,7 @@ const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const messageRoute = require('./routes/messageRoute')
+const userRoute = require('./routes/userRoute')
 const db = require('./db');
 const chatSocket = require('./socket/chat')
 const cors = require('cors');
@@ -23,6 +24,7 @@ app.use(cors({
 chatSocket(io)
  
 app.use('/api/messages', messageRoute)
+app.use('/api/users', userRoute)
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () =>
