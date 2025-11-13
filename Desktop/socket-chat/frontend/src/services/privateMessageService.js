@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from 'axios';
 const API_URL = `${import.meta.env.VITE_API_URL}/api/messages`;
 
 export const getPrivateMessages = async (roomId) => {
@@ -6,7 +6,17 @@ export const getPrivateMessages = async (roomId) => {
 	return res.data;
 };
 
-export const sendPrivateMessage = async (message) => {
-	const res = await axios.post(`${API_URL}/private`, message);
+export const sendPrivateMessage = async ({
+	roomId,
+	sender,
+	receiver,
+	text,
+}) => {
+	const res = await axios.post(`${API_URL}/private`, {
+		roomId,
+		sender,
+		receiver,
+		text,
+	});
 	return res.data;
 };

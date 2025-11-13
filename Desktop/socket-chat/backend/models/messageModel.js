@@ -13,14 +13,14 @@ const MessageModel = {
   },
 
   // PRIVATNI CHAT
-  getPrivateMessages: (roomId, callback) => {
-    const sql = "SELECT * FROM private_messages WHERE roomId = ? ORDER BY timestamp ASC";
+getPrivateMessages: (roomId, callback) => {
+    const sql = "SELECT * FROM private_messages WHERE room_id = ? ORDER BY created_at ASC";
     db.query(sql, [roomId], callback);
   },
 
-  addPrivateMessage: (roomId, sender, text, callback) => {
-    const sql = "INSERT INTO private_messages (roomId, sender, text) VALUES (?, ?, ?)";
-    db.query(sql, [roomId, sender, text], callback);
+  addPrivateMessage: (roomId, sender, receiver, text, callback) => {
+    const sql = "INSERT INTO private_messages (room_id, sender, receiver, text) VALUES (?, ?, ?, ?)";
+    db.query(sql, [roomId, sender, receiver, text], callback);
   }
 };
 
