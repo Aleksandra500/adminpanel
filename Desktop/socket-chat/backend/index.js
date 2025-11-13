@@ -16,6 +16,7 @@ app.use(express.json());
 const allowedOrigins = [
   'http://localhost:5173', // lokalni frontend
   'https://socket-chat-9ibl-b0t3hlfd1-aleksandras-projects-79a46c16.vercel.app', // Vercel frontend
+  'https://socket-chat-9ibl.vercel.app', // kratki Vercel URL
 ];
 
 // Middleware za REST API CORS
@@ -35,7 +36,7 @@ app.use(
 
 const server = http.createServer(app);
 
-// Socket.IO sa dinamičkim CORS-om
+// Socket.IO sa istim allowedOrigins
 const io = new Server(server, {
   cors: {
     origin: function (origin, callback) {
@@ -56,7 +57,18 @@ chatSocket(io);
 
 // REST API rute
 app.use('/api/messages', messageRoute);
-app.use('/api/users', userRoute);
+app.use('/api/users', (req, res, next) => {
+  const origin = req.headers.origin;
+  if (!origin || allowedOrigins.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE');
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
+    next();
+  } else {
+    res.status(403).send('Not allowed by CORS');
+  }
+}, userRoute);
 
 // Pokretanje servera
 const PORT = process.env.PORT || 8100;
