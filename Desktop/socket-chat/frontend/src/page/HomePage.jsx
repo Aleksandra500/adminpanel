@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
-import LoginPage from "./LoginPage";
-import PrivateChat from "./PrivateChat";
-import { getAllUsers } from "../services/userService";
+import { useState, useEffect } from 'react';
+import LoginPage from './LoginPage';
+import PrivateChat from './PrivateChat';
+import Chat from '../Chat';
+import { getAllUsers } from '../services/userService';
 
 export default function HomePage() {
   const [user, setUser] = useState(null);
@@ -23,63 +24,81 @@ export default function HomePage() {
   }, []);
 
   const handleLogin = (username) => {
-    localStorage.setItem("chatUser", username);
+    localStorage.setItem('chatUser', username);
     setUser(username);
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("chatUser");
+    localStorage.removeItem('chatUser');
     setUser(null);
     setPrivateRoom(null);
     setShowGlobalChat(false);
   };
 
-  // Ako nema user-a, prikaži login
   if (!user) return <LoginPage onLogin={handleLogin} />;
 
   return (
-    <div className="flex h-screen bg-gradient-to-br from-gray-900 via-indigo-950 to-black text-white">
-      {/* Sidebar */}
-      <aside className="w-72 bg-[#0f1724] border-r border-white/6 p-4 flex flex-col justify-between">
-        <div className="flex flex-col gap-2">
-          <h2 className="text-lg font-semibold mb-2">Users</h2>
-          {users
-            .filter((u) => u.username !== user)
-            .map((u) => (
-              <button
-                key={u.id}
-                onClick={() => setPrivateRoom({ targetUser: u.username })}
-                className="flex items-center gap-3 w-full text-left px-3 py-2 rounded-md hover:bg-white/6 transition"
-              >
-                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-600 to-indigo-500 flex items-center justify-center text-xs font-semibold">
-                  {u.username?.[0]?.toUpperCase()}
-                </div>
-                <div className="flex-1">
-                  <div className="font-medium truncate">{u.username}</div>
-                  <div className="text-xs text-white/60">online</div>
-                </div>
-              </button>
-            ))}
-        </div>
+    <div className='flex h-screen bg-gradient-to-br from-gray-900 via-indigo-950 to-black text-white'>
+      {/* Sidebar - samo kad NEMA aktivnog chata */}
+      {!privateRoom && !showGlobalChat && (
+        <aside className='w-72 bg-[#0f1724] border-r border-white/6 p-4 flex flex-col justify-between'>
+          <div className='flex flex-col gap-2'>
+            <h2 className='text-lg font-semibold mb-2'>Users</h2>
+            {users
+              .filter((u) => u.username !== user)
+              .map((u) => (
+                <button
+                  key={u.id}
+                  onClick={() => {
+                    setPrivateRoom({ targetUser: u.username });
+                  }}
+                  className='flex items-center gap-3 w-full text-left px-3 py-2 rounded-md hover:bg-white/6 transition'
+                >
+                  <div className='w-9 h-9 rounded-full bg-gradient-to-br from-purple-600 to-indigo-500 flex items-center justify-center text-xs font-semibold'>
+                    {u.username?.[0]?.toUpperCase()}
+                  </div>
+                  <div className='flex-1'>
+                    <div className='font-medium truncate'>{u.username}</div>
+                    <div className='text-xs text-white/60'>online</div>
+                  </div>
+                </button>
+              ))}
+          </div>
 
-        <div className="flex flex-col gap-2 mt-4">
-          <button
-            onClick={() => setShowGlobalChat(true)}
-            className="bg-white/6 hover:bg-white/10 text-white px-3 py-2 rounded-full shadow-md"
-          >
-            🌐 Global Chat
-          </button>
-          <button
-            onClick={handleLogout}
-            className="bg-rose-600 hover:bg-rose-700 text-white px-3 py-2 rounded-full shadow-md"
-          >
-            Logout
-          </button>
-        </div>
-      </aside>
+          <div className='flex flex-col gap-2 mt-4'>
+            <button
+              onClick={() => setShowGlobalChat(true)}
+              className='bg-white/6 hover:bg-white/10 text-white px-3 py-2 rounded-full shadow-md'
+            >
+              🌐 Global Chat
+            </button>
 
-      {/* Glavni prikaz */}
-      <main className="flex-1 flex flex-col overflow-hidden p-4">
+            <button
+              onClick={handleLogout}
+              className='bg-rose-600 hover:bg-rose-700 text-white px-3 py-2 rounded-full shadow-md'
+            >
+              Logout
+            </button>
+          </div>
+        </aside>
+      )}
+
+      {/* GLAVNI SADRŽAJ */}
+      <main className='flex-1 flex flex-col overflow-hidden p-4'>
+        {(privateRoom || showGlobalChat) && (
+          <div className='mb-2'>
+            <button
+              onClick={() => {
+                setPrivateRoom(null);
+                setShowGlobalChat(false);
+              }}
+              className='bg-white/6 hover:bg-white/10 text-white px-3 py-1 rounded-full shadow-md'
+            >
+              ← Back
+            </button>
+          </div>
+        )}
+
         {privateRoom ? (
           <PrivateChat
             currentUser={user}
@@ -87,11 +106,9 @@ export default function HomePage() {
             onClose={() => setPrivateRoom(null)}
           />
         ) : showGlobalChat ? (
-          <div className="flex-1 flex items-center justify-center text-white/60">
-            🌐 Global Chat Page (sadržaj ovde)
-          </div>
+          <Chat currentUser={user} />
         ) : (
-          <div className="flex-1 flex items-center justify-center text-white/60">
+          <div className='flex-1 flex items-center justify-center text-white/60'>
             Izaberi korisnika ili Global Chat
           </div>
         )}
