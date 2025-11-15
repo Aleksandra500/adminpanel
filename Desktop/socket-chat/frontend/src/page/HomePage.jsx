@@ -22,7 +22,7 @@ export default function HomePage() {
 
   if (privateRoom) {
     return (
-      <div className="flex flex-col h-screen bg-gradient-to-br from-purple-100 via-pink-50 to-yellow-50 p-2 sm:p-4">
+      <div className="flex flex-col h-screen bg-gradient-to-br from-purple-100 via-pink-50 to-yellow-50  ">
         <div className="flex justify-between items-center mb-4">
           <button
             onClick={() => setPrivateRoom(null)}
@@ -50,7 +50,7 @@ export default function HomePage() {
 
   // Layout za glavnu stranicu sa ChatPage
   return (
-    <div className="flex flex-col h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-2 sm:p-4">
+    <div className="flex flex-col h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50  ">
       <div className="flex justify-end mb-2 sm:mb-4">
         <button
           onClick={handleLogout}
