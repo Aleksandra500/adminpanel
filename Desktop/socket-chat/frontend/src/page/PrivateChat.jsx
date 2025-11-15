@@ -1,8 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  getPrivateMessages,
-  sendPrivateMessage,
-} from "../services/privateMessageService";
+import { getPrivateMessages, sendPrivateMessage } from "../services/privateMessageService";
 import socket from "../socket";
 
 export default function PrivateChat({ currentUser, targetUser, onClose }) {
@@ -14,16 +11,22 @@ export default function PrivateChat({ currentUser, targetUser, onClose }) {
 
     socket.emit("joinRoom", { currentUser, targetUser });
 
-    socket.on("receivePrivateMessage", (msg) => {
+    const handleReceive = (msg) => {
       if (msg.roomId === roomId) {
-        setMessages((prev) => [...prev, msg]);
+        setMessages((prev) => {
+          // proveravamo da li poruka već postoji u state-u
+          if (prev.some((m) => m.id === msg.id)) return prev;
+          return [...prev, msg];
+        });
       }
-    });
+    };
+
+    socket.on("receivePrivateMessage", handleReceive);
 
     const fetchMessages = async () => {
       try {
         const data = await getPrivateMessages(roomId);
-        setMessages(data);
+        setMessages(data || []);
       } catch (err) {
         console.error(err);
       }
@@ -31,7 +34,7 @@ export default function PrivateChat({ currentUser, targetUser, onClose }) {
     fetchMessages();
 
     return () => {
-      socket.off("receivePrivateMessage");
+      socket.off("receivePrivateMessage", handleReceive);
     };
   }, [currentUser, targetUser]);
 
@@ -40,21 +43,22 @@ export default function PrivateChat({ currentUser, targetUser, onClose }) {
     if (!text.trim()) return;
 
     const roomId = [currentUser, targetUser].sort().join("-");
-    const message = { currentUser, targetUser, text };
 
-    socket.emit("sendPrivateMessage", message);
+    const newMsg = {
+      sender: currentUser,
+      receiver: targetUser,
+      text,
+      roomId,
+      id: Date.now(), // privremeni ID da bismo izbegli duplikate
+    };
+
+    // Dodajemo odmah u state
+    setMessages((prev) => [...prev, newMsg]);
     setText("");
 
     try {
-      const saved = await sendPrivateMessage({
-        roomId,
-        sender: currentUser,
-        receiver: targetUser,
-        text,
-      });
-
-      setMessages((prev) => [...prev, saved]);
-      setText("");
+      await sendPrivateMessage(newMsg); // čuvanje na backendu
+      socket.emit("sendPrivateMessage", newMsg); // emitujemo posle čuvanja
     } catch (err) {
       console.error(err);
     }
