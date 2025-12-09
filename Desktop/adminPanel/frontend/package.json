@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "test": "jest",
+    "test": "jest --config jest.config.cjs",
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
