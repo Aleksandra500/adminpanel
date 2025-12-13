@@ -1,11 +1,12 @@
 import { Outlet } from "react-router-dom"
+import ProductsPage from "./pages/ProductsPage"
 
 function App() {
 
 
   return (
     <>
-     <h1 className=" bg-red-400 ">App Onee</h1>
+   <ProductsPage/>
      <Outlet/>
     </>
   )

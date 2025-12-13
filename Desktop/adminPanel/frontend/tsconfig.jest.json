@@ -7,5 +7,6 @@
     "allowImportingTsExtensions": true,
     "esModuleInterop": true,
     "types": ["jest"]
-  }
+  },
+    "include": ["src/test"]
 }
